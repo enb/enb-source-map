@@ -1,0 +1,29 @@
+{
+  "name": "enb-source-map",
+  "version": "1.3.0",
+  "scripts": {
+    "test": "npm run-script jshint && npm run-script check-style",
+    "jshint": "jshint .",
+    "check-style": "jscs -c node_modules/enb-validate-code/jscs.json techs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/enb-make/enb-source-map.git"
+  },
+  "author": "Marat Dulin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/enb-make/enb-source-map/issues"
+  },
+  "homepage": "https://github.com/enb-make/enb-source-map",
+  "devDependencies": {
+    "jscs": "~1.2.4",
+    "jshint": "~2.4.2",
+    "enb-validate-code": "0.0.1"
+  },
+  "dependencies": {
+    "source-map": "^0.1.33",
+    "btoa": "^1.1.2",
+    "atob": "^1.1.2"
+  }
+}
