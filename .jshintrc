@@ -11,5 +11,6 @@
     "trailing": true,
     "maxlen": 120,
     "quotmark": "single",
-    "node": true
+    "node": true,
+    "mocha": true
 }
