@@ -89,6 +89,12 @@ describe('File', function () {
                 );
 
                 var locator = new SourceLocator('1.js', file.render());
+
+                var comment1Loc = locator.locate(1, 3);
+                comment1Loc.source.should.equal('1.js');
+                comment1Loc.line.should.equal(1);
+                comment1Loc.column.should.equal(3);
+
                 var function1Loc = locator.locate(4, 9);
                 function1Loc.source.should.equal(path.resolve(__dirname + '/../func1.js'));
                 function1Loc.line.should.equal(2);
