@@ -33,6 +33,44 @@ describe('File', function () {
                 file.render().should.equal('line 1\nline 2\nline 3\nline 4\n');
             });
         });
+
+        describe('write()', function () {
+            it('should add content to the output', function () {
+                file.write('1');
+                file.write('2');
+                file.write('3\n');
+                file.write('4\n5');
+                file.render().should.equal('123\n4\n5');
+            });
+
+            it('should move cursor forward', function () {
+                file.getCursor().line.should.equal(1);
+                file.getCursor().column.should.equal(0);
+                file.write('123');
+                file.getCursor().line.should.equal(1);
+                file.getCursor().column.should.equal(3);
+                file.write('456');
+                file.getCursor().line.should.equal(1);
+                file.getCursor().column.should.equal(6);
+                file.write('\n');
+                file.getCursor().line.should.equal(2);
+                file.getCursor().column.should.equal(0);
+                file.write('\n\n');
+                file.getCursor().line.should.equal(4);
+                file.getCursor().column.should.equal(0);
+                file.write('\n123');
+                file.getCursor().line.should.equal(5);
+                file.getCursor().column.should.equal(3);
+            });
+        });
+
+        describe('writeFileFragment()', function () {
+            it('should add content to the output', function () {
+                file.writeFileFragment('2.js', 'line 1\nline 2', 1, 0);
+                file.writeFileFragment('2.js', 'line 3\nline 4', 2, 0);
+                file.render().should.equal('line 1\nline 2line 3\nline 4');
+            });
+        });
     });
 
     describe('with source map', function () {
@@ -64,6 +102,73 @@ describe('File', function () {
                 file.writeFileContent('2.js', 'line 3\nline 4');
                 hasSourceMap(file.render()).should.equal(true);
                 stripSourceMap(file.render()).should.equal('line 1\nline 2\nline 3\nline 4\n');
+            });
+        });
+
+        describe('write()', function () {
+            it('should add content to the output', function () {
+                file.write('1');
+                file.write('2');
+                file.write('3\n');
+                file.write('4\n5\n');
+                hasSourceMap(file.render()).should.equal(true);
+                stripSourceMap(file.render()).should.equal('123\n4\n5\n');
+            });
+
+            it('should move cursor forward', function () {
+                file.getCursor().line.should.equal(1);
+                file.getCursor().column.should.equal(0);
+                file.write('123');
+                file.getCursor().line.should.equal(1);
+                file.getCursor().column.should.equal(3);
+                file.write('456');
+                file.getCursor().line.should.equal(1);
+                file.getCursor().column.should.equal(6);
+                file.write('\n');
+                file.getCursor().line.should.equal(2);
+                file.getCursor().column.should.equal(0);
+                file.write('\n\n');
+                file.getCursor().line.should.equal(4);
+                file.getCursor().column.should.equal(0);
+                file.write('\n123');
+                file.getCursor().line.should.equal(5);
+                file.getCursor().column.should.equal(3);
+            });
+        });
+
+        describe('writeFileFragment()', function () {
+            it('should add content to the output', function () {
+                file.write('_');
+                file.writeFileFragment('2.js', 'line 1\nline 2', 1, 0);
+                file.writeFileFragment('3.js', 'line 3\nline 4', 2, 3);
+                hasSourceMap(file.render()).should.equal(true);
+                stripSourceMap(file.render()).should.equal('_line 1\nline 2line 3\nline 4\n');
+
+                var locator = new SourceLocator('1.js', file.render());
+                var loc1 = locator.locate(1, 0);
+                loc1.source.should.equal('1.js');
+                loc1.line.should.equal(1);
+                loc1.column.should.equal(0);
+
+                var loc2 = locator.locate(1, 1);
+                loc2.source.should.equal(path.resolve(__dirname + '/../2.js'));
+                loc2.line.should.equal(1);
+                loc2.column.should.equal(0);
+
+                var loc3 = locator.locate(2, 1);
+                loc3.source.should.equal(path.resolve(__dirname + '/../2.js'));
+                loc3.line.should.equal(2);
+                loc3.column.should.equal(1);
+
+                var loc4 = locator.locate(2, 6);
+                loc4.source.should.equal(path.resolve(__dirname + '/../3.js'));
+                loc4.line.should.equal(2);
+                loc4.column.should.equal(3);
+
+                var loc5 = locator.locate(3, 1);
+                loc5.source.should.equal(path.resolve(__dirname + '/../3.js'));
+                loc5.line.should.equal(3);
+                loc5.column.should.equal(1);
             });
         });
 
