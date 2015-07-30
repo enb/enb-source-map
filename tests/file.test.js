@@ -1,5 +1,4 @@
 var path = require('path');
-require('chai').should();
 var File = require('../lib/file');
 var SourceLocator = require('../lib/source-locator');
 
