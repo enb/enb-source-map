@@ -65,18 +65,20 @@ describe('Utils', function() {
         });
 
         it('should return same content if no source map line', function() {
-            var lines = utils.removeBuiltInSourceMap(['line1', 'line2'].join('\n'));
-            lines.should.be.deep.equal(['line1', 'line2'].join('\n'));
+            var content = utils.removeBuiltInSourceMap(['line1', 'line2'].join('\n'));
+            content.should.be.deep.equal(['line1', 'line2'].join('\n'));
         });
 
         it('should return same lines if source map line is not the last one', function() {
-            var lines = utils.removeBuiltInSourceMap(['line1', 'line2', SOURCE_MAP_STRING, 'some-line']);
-            lines.should.be.deep.equal(['line1', 'line2']);
+            var expectedLines = ['line1', 'line2', SOURCE_MAP_STRING, 'some-line'];
+            var lines = utils.removeBuiltInSourceMap(expectedLines);
+            lines.should.be.deep.equal(expectedLines);
         });
 
         it('should return same content if source map line is not the last one', function() {
-            var lines = utils.removeBuiltInSourceMap(['line1', 'line2', SOURCE_MAP_STRING, 'some-line'].join('\n'));
-            lines.should.be.deep.equal(['line1', 'line2'].join('\n'));
+            var expectedContent = ['line1', 'line2', SOURCE_MAP_STRING, 'some-line'].join('\n');
+            var content = utils.removeBuiltInSourceMap(expectedContent);
+            content.should.be.deep.equal(expectedContent);
         });
     });
 });
