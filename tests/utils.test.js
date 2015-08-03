@@ -1,4 +1,5 @@
-var expect = require('chai').expect,
+var os = require('os'),
+    expect = require('chai').expect,
     btoa = require('btoa'),
     SourceMapConsumer = require('source-map').SourceMapConsumer,
 
@@ -23,7 +24,7 @@ describe('Utils', function() {
         });
 
         it('should return source map for string content', function() {
-            var sourceMap = utils.getSourceMap(['line1', 'line2', SOURCE_MAP_LINE].join('\n'));
+            var sourceMap = utils.getSourceMap(['line1', 'line2', SOURCE_MAP_LINE].join(os.EOL));
             sourceMap.should.be.deep.equal(STUB_SOURCE_MAP);
         });
 
@@ -33,7 +34,7 @@ describe('Utils', function() {
         });
 
         it('should return null if no sourcemap in content', function() {
-            var sourceMap = utils.getSourceMap(['line1', 'line2'].join('\n'));
+            var sourceMap = utils.getSourceMap(['line1', 'line2'].join(os.EOL));
             expect(sourceMap).to.be.equal(null);
         });
 
@@ -43,7 +44,7 @@ describe('Utils', function() {
         });
 
         it('should return null if sourcemap is not the last line in content', function() {
-            var sourceMap = utils.getSourceMap(['line1', 'line2', SOURCE_MAP_LINE, 'some-line'].join('\n'));
+            var sourceMap = utils.getSourceMap(['line1', 'line2', SOURCE_MAP_LINE, 'some-line'].join(os.EOL));
             expect(sourceMap).to.be.equal(null);
         });
     });
@@ -55,8 +56,8 @@ describe('Utils', function() {
         });
 
         it('should return content without source map line', function() {
-            var content = utils.removeBuiltInSourceMap(['line1', 'line2', SOURCE_MAP_LINE].join('\n'));
-            content.should.be.deep.equal(['line1', 'line2'].join('\n'));
+            var content = utils.removeBuiltInSourceMap(['line1', 'line2', SOURCE_MAP_LINE].join(os.EOL));
+            content.should.be.deep.equal(['line1', 'line2'].join(os.EOL));
         });
 
         it('should return same lines if no source map line', function() {
@@ -65,8 +66,8 @@ describe('Utils', function() {
         });
 
         it('should return same content if no source map line', function() {
-            var content = utils.removeBuiltInSourceMap(['line1', 'line2'].join('\n'));
-            content.should.be.deep.equal(['line1', 'line2'].join('\n'));
+            var content = utils.removeBuiltInSourceMap(['line1', 'line2'].join(os.EOL));
+            content.should.be.deep.equal(['line1', 'line2'].join(os.EOL));
         });
 
         it('should return same lines if source map line is not the last one', function() {
@@ -76,7 +77,7 @@ describe('Utils', function() {
         });
 
         it('should return same content if source map line is not the last one', function() {
-            var expectedContent = ['line1', 'line2', SOURCE_MAP_LINE, 'some-line'].join('\n');
+            var expectedContent = ['line1', 'line2', SOURCE_MAP_LINE, 'some-line'].join(os.EOL);
             var content = utils.removeBuiltInSourceMap(expectedContent);
             content.should.be.deep.equal(expectedContent);
         });
@@ -84,8 +85,8 @@ describe('Utils', function() {
 
     describe('joinContentAndSourceMap()', function() {
         it('should join content and source map', function() {
-            var result = utils.joinContentAndSourceMap(['line1', 'line2'].join('\n'), SOME_SOURCE_MAP);
-            result.should.be.equal(['line1', 'line2', SOURCE_MAP_LINE].join('\n'));
+            var result = utils.joinContentAndSourceMap(['line1', 'line2'].join(os.EOL), SOME_SOURCE_MAP);
+            result.should.be.equal(['line1', 'line2', SOURCE_MAP_LINE].join(os.EOL));
         });
     });
 });

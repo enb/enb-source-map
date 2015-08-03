@@ -1,3 +1,4 @@
+var os = require('os');
 var path = require('path');
 var File = require('../lib/file');
 var SourceLocator = require('../lib/source-locator');
@@ -214,7 +215,7 @@ function hasSourceMap(source) {
 }
 
 function stripSourceMap(source) {
-    var lines = source.split('\n');
+    var lines = source.split(os.EOL);
     lines.pop();
-    return lines.join('\n') + '\n';
+    return lines.join(os.EOL) + '\n';
 }
