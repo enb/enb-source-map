@@ -1,31 +1,25 @@
 var os = require('os'),
     expect = require('chai').expect,
     btoa = require('btoa'),
+    SourceMapGenerator = require('source-map').SourceMapGenerator,
     SourceMapConsumer = require('source-map').SourceMapConsumer,
 
     utils = require('../lib/utils');
 
 describe('Utils', function() {
-    var SOME_SOURCE_MAP = {
-            version: 3,
-            file: 'min.js',
-            names: ['bar', 'baz', 'n'],
-            sources: ['one.js', 'two.js'],
-            sourceRoot: 'http://example.com/www/js/',
-            mappings: 'CAAC,IAAI,IAAM,SAAUA,GAClB,OAAOC,IAAID;CCDb,IAAI,IAAM,SAAUE,GAClB,OAAOA'
-        },
-        STUB_SOURCE_MAP = new SourceMapConsumer(SOME_SOURCE_MAP),
-        SOURCE_MAP_LINE = '//# sourceMappingURL=data:application/json;base64,' + btoa(JSON.stringify(SOME_SOURCE_MAP));
+    var SOURCE_MAP_GENERATOR = new SourceMapGenerator(),
+        SOURCE_MAP_CONSUMER = new SourceMapConsumer(JSON.parse(SOURCE_MAP_GENERATOR.toString())),
+        SOURCE_MAP_LINE = '//# sourceMappingURL=data:application/json;base64,' + btoa(SOURCE_MAP_GENERATOR.toString());
 
     describe('getSourceMap()', function() {
         it('should return source map for bunch of lines', function() {
             var sourceMap = utils.getSourceMap(['line1', 'line2', SOURCE_MAP_LINE]);
-            sourceMap.should.be.deep.equal(STUB_SOURCE_MAP);
+            sourceMap.should.be.deep.equal(SOURCE_MAP_CONSUMER);
         });
 
         it('should return source map for string content', function() {
             var sourceMap = utils.getSourceMap(['line1', 'line2', SOURCE_MAP_LINE].join(os.EOL));
-            sourceMap.should.be.deep.equal(STUB_SOURCE_MAP);
+            sourceMap.should.be.deep.equal(SOURCE_MAP_CONSUMER);
         });
 
         it('should return null if no sourcemap in lines', function() {
@@ -50,7 +44,7 @@ describe('Utils', function() {
     });
 
     describe('removeBuiltInSourceMap()', function() {
-        it('should return source map line', function() {
+        it('should return lines without source map line', function() {
             var lines = utils.removeBuiltInSourceMap(['line1', 'line2', SOURCE_MAP_LINE]);
             lines.should.be.deep.equal(['line1', 'line2']);
         });
@@ -85,8 +79,20 @@ describe('Utils', function() {
 
     describe('joinContentAndSourceMap()', function() {
         it('should join content and source map', function() {
-            var result = utils.joinContentAndSourceMap(['line1', 'line2'].join(os.EOL), SOME_SOURCE_MAP);
+            var result = utils.joinContentAndSourceMap(['line1', 'line2'].join(os.EOL), SOURCE_MAP_GENERATOR);
             result.should.be.equal(['line1', 'line2', SOURCE_MAP_LINE].join(os.EOL));
+        });
+
+        it('should throw if not a SourceMapGenerator passed', function() {
+            (function() {
+                return utils.joinContentAndSourceMap('some-content', SOURCE_MAP_CONSUMER);
+            }).should.throw();
+        });
+
+        it('should throw if source map not passed', function() {
+            (function() {
+                return utils.joinContentAndSourceMap('some-content');
+            }).should.throw();
         });
     });
 });
