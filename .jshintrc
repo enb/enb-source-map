@@ -12,5 +12,6 @@
     "maxlen": 120,
     "quotmark": "single",
     "node": true,
-    "mocha": true
+    "mocha": true,
+    "laxbreak": true
 }
