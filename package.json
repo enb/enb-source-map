@@ -17,16 +17,16 @@
     "url": "https://github.com/enb-make/enb-source-map/issues"
   },
   "homepage": "https://github.com/enb-make/enb-source-map",
+  "dependencies": {
+    "source-map": "0.1.43",
+    "btoa": "1.1.2",
+    "atob": "1.1.2"
+  },
   "devDependencies": {
     "chai": "^1.9.1",
     "enb-validate-code": "0.0.1",
     "jscs": "~1.2.4",
     "jshint": "^2.5.2",
     "mocha": "^1.20.1"
-  },
-  "dependencies": {
-    "source-map": "^0.1.33",
-    "btoa": "^1.1.2",
-    "atob": "^1.1.2"
   }
 }
