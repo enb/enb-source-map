@@ -1,13 +1,16 @@
 var os = require('os');
 var path = require('path');
+var sinon = require('sinon');
+var SourceMapGenerator = require('source-map').SourceMapGenerator;
 var File = require('../lib/file');
 var SourceLocator = require('../lib/source-locator');
+var utils = require('../lib/utils');
 
 describe('File', function () {
     var file;
     describe('without source map', function () {
         beforeEach(function () {
-            file = new File('1.js', false);
+            file = new File('1.js', {sourceMap: false});
         });
 
         describe('writeLine()', function () {
@@ -75,7 +78,7 @@ describe('File', function () {
 
     describe('with source map', function () {
         beforeEach(function () {
-            file = new File('1.js', true);
+            file = new File('1.js', {sourceMap: true});
         });
 
         describe('writeLine()', function () {
@@ -205,6 +208,58 @@ describe('File', function () {
                 function1Loc.line.should.equal(2);
                 function1Loc.column.should.equal(9);
             });
+        });
+    });
+
+    describe('options', function() {
+        var sandbox = sinon.sandbox.create();
+
+        beforeEach(function() {
+            sandbox.stub(utils);
+        });
+
+        afterEach(function() {
+            sandbox.restore();
+        });
+
+        it('should handle old-style useSourceMap second parameter (false)', function() {
+            var file = new File('1.js', false);
+
+            file.render();
+
+            return utils.joinContentAndSourceMap.should.not.be.called;
+        });
+
+        it('should handle old-style useSourceMap second parameter (true)', function() {
+            var file = new File('1.js', true);
+
+            file.render();
+
+            return utils.joinContentAndSourceMap.should.be.called;
+        });
+
+        it('should use inline comments by default', function() {
+            var file = new File('1.js', {sourceMap: true});
+
+            file.render();
+
+            utils.joinContentAndSourceMap.should.be.calledWithMatch(
+                sinon.match.string,
+                sinon.match.instanceOf(SourceMapGenerator),
+                {comment: 'inline'}
+            );
+        });
+
+        it('should handle comment option', function() {
+            var file = new File('1.js', {sourceMap: true, comment: 'block'});
+
+            file.render();
+
+            utils.joinContentAndSourceMap.should.be.calledWithMatch(
+                sinon.match.string,
+                sinon.match.instanceOf(SourceMapGenerator),
+                {comment: 'block'}
+            );
         });
     });
 });
