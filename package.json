@@ -27,6 +27,8 @@
     "enb-validate-code": "0.0.1",
     "jscs": "1.4.5",
     "jshint": "2.8.0",
-    "mocha": "2.2.5"
+    "mocha": "2.2.5",
+    "sinon": "1.15.4",
+    "sinon-chai": "2.8.0"
   }
 }

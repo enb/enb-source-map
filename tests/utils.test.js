@@ -9,7 +9,8 @@ var os = require('os'),
 describe('Utils', function() {
     var SOURCE_MAP_GENERATOR = new SourceMapGenerator(),
         SOURCE_MAP_CONSUMER = new SourceMapConsumer(JSON.parse(SOURCE_MAP_GENERATOR.toString())),
-        SOURCE_MAP_LINE = '//# sourceMappingURL=data:application/json;base64,' + btoa(SOURCE_MAP_GENERATOR.toString());
+        SOURCE_MAP_COMMENT = '# sourceMappingURL=data:application/json;base64,' + btoa(SOURCE_MAP_GENERATOR.toString()),
+        SOURCE_MAP_LINE = '//' + SOURCE_MAP_COMMENT;
 
     describe('getSourceMap()', function() {
         it('should return source map for bunch of lines', function() {
@@ -40,6 +41,11 @@ describe('Utils', function() {
         it('should return null if sourcemap is not the last line in content', function() {
             var sourceMap = utils.getSourceMap(['line1', 'line2', SOURCE_MAP_LINE, 'some-line'].join(os.EOL));
             expect(sourceMap).to.be.equal(null);
+        });
+
+        it('should return source map wrapped with multiline comment', function() {
+            var sourceMap = utils.getSourceMap(['line1', 'line2', '/*' + SOURCE_MAP_COMMENT + '*/'].join(os.EOL));
+            sourceMap.should.be.deep.equal(SOURCE_MAP_CONSUMER);
         });
     });
 
@@ -75,6 +81,11 @@ describe('Utils', function() {
             var content = utils.removeBuiltInSourceMap(expectedContent);
             content.should.be.deep.equal(expectedContent);
         });
+
+        it('should return lines without source map line if source map wrapped with multiline comment', function() {
+            var lines = utils.removeBuiltInSourceMap(['line1', 'line2', '/*' + SOURCE_MAP_COMMENT + '*/']);
+            lines.should.be.deep.equal(['line1', 'line2']);
+        });
     });
 
     describe('joinContentAndSourceMap()', function() {
@@ -93,6 +104,15 @@ describe('Utils', function() {
             (function() {
                 return utils.joinContentAndSourceMap('some-content');
             }).should.throw();
+        });
+
+        it('should join using block comments if configured', function() {
+            var result = utils.joinContentAndSourceMap(
+                    ['line1', 'line2'].join(os.EOL),
+                    SOURCE_MAP_GENERATOR,
+                    {comment: 'block'}
+                );
+            result.should.be.equal(['line1', 'line2', '/*' + SOURCE_MAP_COMMENT + '*/'].join(os.EOL));
         });
     });
 });
