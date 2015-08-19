@@ -1,5 +1,6 @@
 var os = require('os');
 var path = require('path');
+var format = require('util').format;
 var sinon = require('sinon');
 var SourceMapGenerator = require('source-map').SourceMapGenerator;
 var File = require('../lib/file');
@@ -99,15 +100,6 @@ describe('File', function () {
             });
         });
 
-        describe('writeFileContent()', function () {
-            it('should add content to the output', function () {
-                file.writeFileContent('2.js', 'line 1\nline 2');
-                file.writeFileContent('2.js', 'line 3\nline 4');
-                hasSourceMap(file.render()).should.equal(true);
-                stripSourceMap(file.render()).should.equal('line 1\nline 2\nline 3\nline 4\n');
-            });
-        });
-
         describe('write()', function () {
             it('should add content to the output', function () {
                 file.write('1');
@@ -172,6 +164,115 @@ describe('File', function () {
                 loc5.source.should.equal(path.resolve(__dirname + '/../3.js'));
                 loc5.line.should.equal(3);
                 loc5.column.should.equal(1);
+            });
+        });
+
+        describe('writeFileContent()', function () {
+            it('should add content to the output', function () {
+                file.writeFileContent('2.js', 'line 1\nline 2');
+                file.writeFileContent('2.js', 'line 3\nline 4');
+                hasSourceMap(file.render()).should.equal(true);
+                stripSourceMap(file.render()).should.equal('line 1\nline 2\nline 3\nline 4\n');
+            });
+
+            describe('with existing source map', function() {
+                it('should point to source file', function () {
+                    var middleFile = new File('middle-file.js', {sourceMap: true});
+                    middleFile.writeFileContent('source.js', 'line');
+                    var middleContent = middleFile.render();
+
+                    file.writeFileContent('some-file.js', middleContent);
+
+                    var pos = utils.getSourceMap(file.render()).originalPositionFor({line: 1, column: 0});
+                    pos.source.should.equal('source.js');
+                    pos.line.should.equal(1);
+                    pos.column.should.equal(0);
+                });
+
+                it('should save relative path to source file', function () {
+                    var middleFile = new File('middle-file.js', {sourceMap: true});
+                    middleFile.writeFileContent('../other/path/source.js', 'line');
+                    var middleContent = middleFile.render();
+
+                    file.writeFileContent('../some/path/some-file.js', middleContent);
+
+                    var pos = utils.getSourceMap(file.render()).originalPositionFor({line: 1, column: 0});
+                    pos.source.should.equal('../some/other/path/source.js');
+                });
+
+                it('should save absolute path to source file when passed absolute', function () {
+                    var middleFile = new File('middle-file.js', {sourceMap: true});
+                    middleFile.writeFileContent('../other/path/source.js', 'line');
+                    var middleContent = middleFile.render();
+
+                    file.writeFileContent('/some/path/some-file.js', middleContent);
+
+                    var pos = utils.getSourceMap(file.render()).originalPositionFor({line: 1, column: 0});
+                    pos.source.should.equal('/some/other/path/source.js');
+                });
+
+                it('should keep absolute source path', function () {
+                    var middleFile = new File('middle-file.js', {sourceMap: true});
+                    middleFile.writeFileContent('/other/path/source.js', 'line');
+                    var middleContent = middleFile.render();
+
+                    file.writeFileContent('/some/path/some-file.js', middleContent);
+
+                    var pos = utils.getSourceMap(file.render()).originalPositionFor({line: 1, column: 0});
+                    pos.source.should.equal('/other/path/source.js');
+                });
+
+                it('should correctly handle column numbers', function () {
+                    var css = [
+                            '.button',
+                            '{',
+                            '    vertical-align: middle;',
+                            '}'
+                        ].join('\n'),
+                        map = mkMap_(
+                            'middle.css', 'source.css',
+                            [[1, 0],      [1, 0]],
+                            [[3, 4],      [3, 4]],
+                            [[3, 27],     [3, 27]],
+                            [[4, 1],      [4, 1]]
+                        ),
+                        middleContent = utils.joinContentAndSourceMap(css, map);
+
+                    file.writeFileContent('some-file.js', middleContent);
+
+                    var expected = toReadableString_(utils.getSourceMap(middleContent));
+                    var actual = toReadableString_(utils.getSourceMap(file.render()));
+                    expected.should.equal(actual);
+                });
+
+                ///
+                function toReadableString_(consumer) {
+                    var pieces = [];
+                    consumer.eachMapping(function(mapping) {
+                        pieces.push(format('%s, %s -> %s, %s  %s',
+                            mapping.generatedLine,
+                            mapping.generatedColumn,
+                            mapping.originalLine,
+                            mapping.originalColumn,
+                            mapping.source
+                        ));
+                    });
+                    return pieces.join('\n');
+                }
+
+                ///
+                function mkMap_(generated, source) {
+                    var map = new SourceMapGenerator({file: generated});
+                    var mappings = [].slice.call(arguments, 2);
+                    mappings.forEach(function(m) {
+                        map.addMapping({
+                            source: source,
+                            original: {line: m[1][0], column: m[1][1]},
+                            generated: {line: m[0][0], column: m[0][1]}
+                        });
+                    });
+                    return map;
+                }
             });
         });
 
