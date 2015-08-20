@@ -1,10 +1,8 @@
 var os = require('os');
-var path = require('path');
 var format = require('util').format;
 var sinon = require('sinon');
 var SourceMapGenerator = require('source-map').SourceMapGenerator;
 var File = require('../lib/file');
-var SourceLocator = require('../lib/source-locator');
 var utils = require('../lib/utils');
 
 describe('File', function () {
@@ -139,31 +137,14 @@ describe('File', function () {
                 hasSourceMap(file.render()).should.equal(true);
                 stripSourceMap(file.render()).should.equal('_line 1\nline 2line 3\nline 4\n');
 
-                var locator = new SourceLocator('1.js', file.render());
-                var loc1 = locator.locate(1, 0);
-                loc1.source.should.equal('1.js');
-                loc1.line.should.equal(1);
-                loc1.column.should.equal(0);
-
-                var loc2 = locator.locate(1, 1);
-                loc2.source.should.equal(path.resolve(__dirname + '/../2.js'));
-                loc2.line.should.equal(1);
-                loc2.column.should.equal(0);
-
-                var loc3 = locator.locate(2, 1);
-                loc3.source.should.equal(path.resolve(__dirname + '/../2.js'));
-                loc3.line.should.equal(2);
-                loc3.column.should.equal(1);
-
-                var loc4 = locator.locate(2, 6);
-                loc4.source.should.equal(path.resolve(__dirname + '/../3.js'));
-                loc4.line.should.equal(2);
-                loc4.column.should.equal(3);
-
-                var loc5 = locator.locate(3, 1);
-                loc5.source.should.equal(path.resolve(__dirname + '/../3.js'));
-                loc5.line.should.equal(3);
-                loc5.column.should.equal(1);
+                toReadableString(utils.getSourceMap(file.render())).should.equal(
+                    [
+                        '1, 1 -> 1, 0  2.js',
+                        '2, 0 -> 2, 0  2.js',
+                        '2, 6 -> 2, 3  3.js',
+                        '3, 0 -> 3, 0  3.js'
+                    ].join('\n')
+                );
             });
         });
 
@@ -240,25 +221,10 @@ describe('File', function () {
 
                     file.writeFileContent('some-file.js', middleContent);
 
-                    var expected = toReadableString_(utils.getSourceMap(middleContent));
-                    var actual = toReadableString_(utils.getSourceMap(file.render()));
+                    var expected = toReadableString(utils.getSourceMap(middleContent));
+                    var actual = toReadableString(utils.getSourceMap(file.render()));
                     expected.should.equal(actual);
                 });
-
-                ///
-                function toReadableString_(consumer) {
-                    var pieces = [];
-                    consumer.eachMapping(function(mapping) {
-                        pieces.push(format('%s, %s -> %s, %s  %s',
-                            mapping.generatedLine,
-                            mapping.generatedColumn,
-                            mapping.originalLine,
-                            mapping.originalColumn,
-                            mapping.source
-                        ));
-                    });
-                    return pieces.join('\n');
-                }
 
                 ///
                 function mkMap_(generated, source) {
@@ -282,32 +248,43 @@ describe('File', function () {
                 file.writeContent('// Some unmapped content');
                 file.writeFileContent(
                     'func1.js',
-                    '// anonymous function here\n' +
-                    'var f1 = function() {\n' +
-                    '    return 1;\n' +
-                    '};\n' +
-                    '// end of anonymous function\n'
+                    [
+                        '// anonymous function here',
+                        'var f1 = function() {',
+                        '    return 1;',
+                        '};',
+                        '// end of anonymous function',
+                        ''
+                    ].join('\n')
                 );
                 file.writeFileContent(
                     'func2.js',
-                    '// named function here\n' +
-                    '    function f1() {\n' +
-                    '        return 1;\n' +
-                    '    }\n' +
-                    '// end of named function\n'
+                    [
+                        '// named function here',
+                        '    function f1() {',
+                        '        return 1;',
+                        '    }',
+                        '// end of named function',
+                        ''
+                    ].join('\n')
                 );
 
-                var locator = new SourceLocator('1.js', file.render());
-
-                var comment1Loc = locator.locate(1, 3);
-                comment1Loc.source.should.equal('1.js');
-                comment1Loc.line.should.equal(1);
-                comment1Loc.column.should.equal(3);
-
-                var function1Loc = locator.locate(4, 9);
-                function1Loc.source.should.equal(path.resolve(__dirname + '/../func1.js'));
-                function1Loc.line.should.equal(2);
-                function1Loc.column.should.equal(9);
+                toReadableString(utils.getSourceMap(file.render())).should.equal(
+                    [
+                        '3, 0 -> 1, 0  func1.js',
+                        '4, 0 -> 2, 0  func1.js',
+                        '5, 0 -> 3, 0  func1.js',
+                        '6, 0 -> 4, 0  func1.js',
+                        '7, 0 -> 5, 0  func1.js',
+                        '8, 0 -> 6, 0  func1.js',
+                        '9, 0 -> 1, 0  func2.js',
+                        '10, 0 -> 2, 0  func2.js',
+                        '11, 0 -> 3, 0  func2.js',
+                        '12, 0 -> 4, 0  func2.js',
+                        '13, 0 -> 5, 0  func2.js',
+                        '14, 0 -> 6, 0  func2.js'
+                    ].join('\n')
+                );
             });
         });
     });
@@ -374,4 +351,19 @@ function stripSourceMap(source) {
     var lines = source.split(os.EOL);
     lines.pop();
     return lines.join(os.EOL) + '\n';
+}
+
+///
+function toReadableString(consumer) {
+    var pieces = [];
+    consumer.eachMapping(function(mapping) {
+        pieces.push(format('%s, %s -> %s, %s  %s',
+            mapping.generatedLine,
+            mapping.generatedColumn,
+            mapping.originalLine,
+            mapping.originalColumn,
+            mapping.source
+        ));
+    });
+    return pieces.join('\n');
 }
