@@ -134,10 +134,10 @@ describe('Utils', function() {
             result.should.be.equal(['line1', 'line2', SOURCE_MAP_LINE].join(os.EOL));
         });
 
-        it('should throw if not a SourceMapGenerator passed', function() {
-            (function() {
-                return utils.joinContentAndSourceMap('some-content', SOURCE_MAP_CONSUMER);
-            }).should.throw();
+        it('should be able to take sourceMap without SouceMapGenerator wrapper', function () {
+            var sourceMap = JSON.parse(SOURCE_MAP_GENERATOR.toString());
+            var result = utils.joinContentAndSourceMap(['line1', 'line2'].join(os.EOL), sourceMap);
+            result.should.be.equal(['line1', 'line2', SOURCE_MAP_LINE].join(os.EOL));
         });
 
         it('should throw if source map not passed', function() {
