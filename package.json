@@ -5,7 +5,7 @@
     "test": "npm run-script jshint && npm run-script check-style && npm run-script unit",
     "jshint": "jshint .",
     "unit": "mocha tests",
-    "check-style": "jscs -c node_modules/enb-validate-code/jscs.json lib"
+    "check-style": "jscs -c jscs.js lib"
   },
   "repository": {
     "type": "git",
@@ -18,17 +18,16 @@
   },
   "homepage": "https://github.com/enb-make/enb-source-map",
   "dependencies": {
-    "source-map": "0.1.43",
+    "source-map": "0.4.4",
     "btoa": "1.1.2",
     "atob": "1.1.2"
   },
   "devDependencies": {
     "chai": "3.2.0",
-    "enb-validate-code": "0.0.1",
-    "jscs": "1.4.5",
+    "jscs": "2.1.1",
     "jshint": "2.8.0",
-    "mocha": "2.2.5",
-    "sinon": "1.15.4",
+    "mocha": "2.3.1",
+    "sinon": "1.16.1",
     "sinon-chai": "2.8.0"
   }
 }
