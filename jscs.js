@@ -24,7 +24,7 @@ module.exports = {
     disallowQuotedKeysInObjects: 'allButReserved',
     disallowSpaceAfterObjectKeys: true,
     requireCommaBeforeLineBreak: true,
-    requireOperatorBeforeLineBreak: true,
+    requireOperatorBeforeLineBreak: false,
     disallowSpaceAfterPrefixUnaryOperators: true,
     disallowSpaceBeforePostfixUnaryOperators: true,
     requireSpaceBeforeBinaryOperators: true,
