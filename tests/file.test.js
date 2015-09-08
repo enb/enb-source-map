@@ -1,6 +1,6 @@
-var os = require('os');
 var format = require('util').format;
 var sinon = require('sinon');
+var SourceMapConsumer = require('source-map').SourceMapConsumer;
 var SourceMapGenerator = require('source-map').SourceMapGenerator;
 var File = require('../lib/file');
 var utils = require('../lib/utils');
@@ -16,7 +16,7 @@ describe('File', function () {
             it('should add a new line to the output', function () {
                 file.writeLine('line 1');
                 file.writeLine('line 2');
-                file.render().should.equal('line 1\nline 2\n');
+                file.getContent().should.equal('line 1\nline 2\n');
             });
         });
 
@@ -24,7 +24,7 @@ describe('File', function () {
             it('should add content to the output', function () {
                 file.writeContent('line 1\nline 2');
                 file.writeContent('line 3\nline 4');
-                file.render().should.equal('line 1\nline 2\nline 3\nline 4\n');
+                file.getContent().should.equal('line 1\nline 2\nline 3\nline 4\n');
             });
         });
 
@@ -32,7 +32,7 @@ describe('File', function () {
             it('should add content to the output', function () {
                 file.writeFileContent('2.js', 'line 1\nline 2');
                 file.writeFileContent('2.js', 'line 3\nline 4');
-                file.render().should.equal('line 1\nline 2\nline 3\nline 4\n');
+                file.getContent().should.equal('line 1\nline 2\nline 3\nline 4\n');
             });
         });
 
@@ -42,7 +42,7 @@ describe('File', function () {
                 file.write('2');
                 file.write('3\n');
                 file.write('4\n5');
-                file.render().should.equal('123\n4\n5');
+                file.getContent().should.equal('123\n4\n5');
             });
 
             it('should move cursor forward', function () {
@@ -70,7 +70,7 @@ describe('File', function () {
             it('should add content to the output', function () {
                 file.writeFileFragment('2.js', 'line 1\nline 2', 1, 0);
                 file.writeFileFragment('2.js', 'line 3\nline 4', 2, 0);
-                file.render().should.equal('line 1\nline 2line 3\nline 4');
+                file.getContent().should.equal('line 1\nline 2line 3\nline 4');
             });
         });
     });
@@ -84,8 +84,8 @@ describe('File', function () {
             it('should add a new line to the output', function () {
                 file.writeLine('line 1');
                 file.writeLine('line 2');
-                hasSourceMap(file.render()).should.equal(true);
-                stripSourceMap(file.render()).should.equal('line 1\nline 2\n');
+
+                file.getContent().should.equal('line 1\nline 2\n');
             });
         });
 
@@ -93,8 +93,8 @@ describe('File', function () {
             it('should add content to the output', function () {
                 file.writeContent('line 1\nline 2');
                 file.writeContent('line 3\nline 4');
-                hasSourceMap(file.render()).should.equal(true);
-                stripSourceMap(file.render()).should.equal('line 1\nline 2\nline 3\nline 4\n');
+
+                file.getContent().should.equal('line 1\nline 2\nline 3\nline 4\n');
             });
         });
 
@@ -104,8 +104,8 @@ describe('File', function () {
                 file.write('2');
                 file.write('3\n');
                 file.write('4\n5\n');
-                hasSourceMap(file.render()).should.equal(true);
-                stripSourceMap(file.render()).should.equal('123\n4\n5\n');
+
+                file.getContent().should.equal('123\n4\n5\n');
             });
 
             it('should move cursor forward', function () {
@@ -134,10 +134,9 @@ describe('File', function () {
                 file.write('_');
                 file.writeFileFragment('2.js', 'line 1\nline 2', 1, 0);
                 file.writeFileFragment('3.js', 'line 3\nline 4', 2, 3);
-                hasSourceMap(file.render()).should.equal(true);
-                stripSourceMap(file.render()).should.equal('_line 1\nline 2line 3\nline 4\n');
 
-                toReadableString(utils.getSourceMap(file.render())).should.equal(
+                file.getContent().should.equal('_line 1\nline 2line 3\nline 4');
+                toReadableString(file.getSourceMap()).should.equal(
                     [
                         '1, 1 -> 1, 0  2.js',
                         '2, 0 -> 2, 0  2.js',
@@ -152,8 +151,7 @@ describe('File', function () {
             it('should add content to the output', function () {
                 file.writeFileContent('2.js', 'line 1\nline 2');
                 file.writeFileContent('2.js', 'line 3\nline 4');
-                hasSourceMap(file.render()).should.equal(true);
-                stripSourceMap(file.render()).should.equal('line 1\nline 2\nline 3\nline 4\n');
+                file.getContent().should.equal('line 1\nline 2\nline 3\nline 4\n');
             });
 
             describe('with existing source map', function() {
@@ -164,7 +162,7 @@ describe('File', function () {
 
                     file.writeFileContent('some-file.js', middleContent);
 
-                    var pos = utils.getSourceMap(file.render()).originalPositionFor({line: 1, column: 0});
+                    var pos = getOriginalSourceMapPosition({ line: 1, column: 0 }, file.getSourceMap());
                     pos.source.should.equal('source.js');
                     pos.line.should.equal(1);
                     pos.column.should.equal(0);
@@ -177,7 +175,7 @@ describe('File', function () {
 
                     file.writeFileContent('../some/path/some-file.js', middleContent);
 
-                    var pos = utils.getSourceMap(file.render()).originalPositionFor({line: 1, column: 0});
+                    var pos = getOriginalSourceMapPosition({ line: 1, column: 0 }, file.getSourceMap());
                     pos.source.should.equal('../some/other/path/source.js');
                 });
 
@@ -188,7 +186,7 @@ describe('File', function () {
 
                     file.writeFileContent('/some/path/some-file.js', middleContent);
 
-                    var pos = utils.getSourceMap(file.render()).originalPositionFor({line: 1, column: 0});
+                    var pos = getOriginalSourceMapPosition({ line: 1, column: 0 }, file.getSourceMap());
                     pos.source.should.equal('/some/other/path/source.js');
                 });
 
@@ -199,7 +197,7 @@ describe('File', function () {
 
                     file.writeFileContent('/some/path/some-file.js', middleContent);
 
-                    var pos = utils.getSourceMap(file.render()).originalPositionFor({line: 1, column: 0});
+                    var pos = getOriginalSourceMapPosition({ line: 1, column: 0 }, file.getSourceMap());
                     pos.source.should.equal('/other/path/source.js');
                 });
 
@@ -222,7 +220,7 @@ describe('File', function () {
                     file.writeFileContent('some-file.js', middleContent);
 
                     var expected = toReadableString(utils.getSourceMap(middleContent));
-                    var actual = toReadableString(utils.getSourceMap(file.render()));
+                    var actual = toReadableString(file.getSourceMap());
                     expected.should.equal(actual);
                 });
 
@@ -342,19 +340,11 @@ describe('File', function () {
     });
 });
 
-function hasSourceMap(source) {
-    var lines = source.split('\n');
-    return lines[lines.length - 1].indexOf('//# sourceMappingURL=') === 0;
-}
-
-function stripSourceMap(source) {
-    var lines = source.split(os.EOL);
-    lines.pop();
-    return lines.join(os.EOL) + '\n';
-}
-
 ///
-function toReadableString(consumer) {
+function toReadableString(sourceMap) {
+    var consumer = sourceMap instanceof SourceMapConsumer
+        ? sourceMap
+        : new SourceMapConsumer(sourceMap);
     var pieces = [];
     consumer.eachMapping(function(mapping) {
         pieces.push(format('%s, %s -> %s, %s  %s',
@@ -366,4 +356,8 @@ function toReadableString(consumer) {
         ));
     });
     return pieces.join('\n');
+}
+
+function getOriginalSourceMapPosition(position, sourceMap) {
+    return (new SourceMapConsumer(sourceMap)).originalPositionFor(position);
 }
