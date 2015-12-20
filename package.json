@@ -18,9 +18,9 @@
   },
   "homepage": "https://github.com/enb-make/enb-source-map",
   "dependencies": {
-    "source-map": "0.4.4",
+    "atob": "2.0.0",
     "btoa": "1.1.2",
-    "atob": "1.1.2"
+    "source-map": "0.5.3"
   },
   "devDependencies": {
     "chai": "3.4.1",
