@@ -1,15 +1,15 @@
-var format = require('util').format;
-var sinon = require('sinon');
-var SourceMapConsumer = require('source-map').SourceMapConsumer;
-var SourceMapGenerator = require('source-map').SourceMapGenerator;
-var File = require('../lib/file');
-var utils = require('../lib/utils');
+var format = require('util').format,
+    sinon = require('sinon'),
+    SourceMapConsumer = require('source-map').SourceMapConsumer,
+    SourceMapGenerator = require('source-map').SourceMapGenerator,
+    File = require('../lib/file'),
+    utils = require('../lib/utils');
 
 describe('File', function () {
     var file;
     describe('without source map', function () {
         beforeEach(function () {
-            file = new File('1.js', {sourceMap: false});
+            file = new File('1.js', { sourceMap: false });
         });
 
         describe('writeLine()', function () {
@@ -77,7 +77,7 @@ describe('File', function () {
 
     describe('with source map', function () {
         beforeEach(function () {
-            file = new File('1.js', {sourceMap: true});
+            file = new File('1.js', { sourceMap: true });
         });
 
         describe('writeLine()', function () {
@@ -154,9 +154,9 @@ describe('File', function () {
                 file.getContent().should.equal('line 1\nline 2\nline 3\nline 4\n');
             });
 
-            describe('with existing source map', function() {
+            describe('with existing source map', function () {
                 it('should point to source file', function () {
-                    var middleFile = new File('middle-file.js', {sourceMap: true});
+                    var middleFile = new File('middle-file.js', { sourceMap: true });
                     middleFile.writeFileContent('source.js', 'line');
                     var middleContent = middleFile.render();
 
@@ -169,7 +169,7 @@ describe('File', function () {
                 });
 
                 it('should save relative path to source file', function () {
-                    var middleFile = new File('middle-file.js', {sourceMap: true});
+                    var middleFile = new File('middle-file.js', { sourceMap: true });
                     middleFile.writeFileContent('../other/path/source.js', 'line');
                     var middleContent = middleFile.render();
 
@@ -180,7 +180,7 @@ describe('File', function () {
                 });
 
                 it('should save absolute path to source file when passed absolute', function () {
-                    var middleFile = new File('middle-file.js', {sourceMap: true});
+                    var middleFile = new File('middle-file.js', { sourceMap: true });
                     middleFile.writeFileContent('../other/path/source.js', 'line');
                     var middleContent = middleFile.render();
 
@@ -191,7 +191,7 @@ describe('File', function () {
                 });
 
                 it('should keep absolute source path', function () {
-                    var middleFile = new File('middle-file.js', {sourceMap: true});
+                    var middleFile = new File('middle-file.js', { sourceMap: true });
                     middleFile.writeFileContent('/other/path/source.js', 'line');
                     var middleContent = middleFile.render();
 
@@ -219,20 +219,21 @@ describe('File', function () {
 
                     file.writeFileContent('some-file.js', middleContent);
 
-                    var expected = toReadableString(utils.getSourceMap(middleContent));
-                    var actual = toReadableString(file.getSourceMap());
+                    var expected = toReadableString(utils.getSourceMap(middleContent)),
+                        actual = toReadableString(file.getSourceMap());
+
                     expected.should.equal(actual);
                 });
 
-                ///
                 function mkMap_(generated, source) {
-                    var map = new SourceMapGenerator({file: generated});
-                    var mappings = [].slice.call(arguments, 2);
-                    mappings.forEach(function(m) {
+                    var map = new SourceMapGenerator({ file: generated }),
+                        mappings = [].slice.call(arguments, 2);
+
+                    mappings.forEach(function (m) {
                         map.addMapping({
                             source: source,
-                            original: {line: m[1][0], column: m[1][1]},
-                            generated: {line: m[0][0], column: m[0][1]}
+                            original: { line: m[1][0], column: m[1][1] },
+                            generated: { line: m[0][0], column: m[0][1] }
                         });
                     });
                     return map;
@@ -248,7 +249,7 @@ describe('File', function () {
                     'func1.js',
                     [
                         '// anonymous function here',
-                        'var f1 = function() {',
+                        'var f1 = function () {',
                         '    return 1;',
                         '};',
                         '// end of anonymous function',
@@ -287,18 +288,18 @@ describe('File', function () {
         });
     });
 
-    describe('options', function() {
+    describe('options', function () {
         var sandbox = sinon.sandbox.create();
 
-        beforeEach(function() {
+        beforeEach(function () {
             sandbox.stub(utils);
         });
 
-        afterEach(function() {
+        afterEach(function () {
             sandbox.restore();
         });
 
-        it('should handle old-style useSourceMap second parameter (false)', function() {
+        it('should handle old-style useSourceMap second parameter (false)', function () {
             var file = new File('1.js', false);
 
             file.render();
@@ -306,7 +307,7 @@ describe('File', function () {
             return utils.joinContentAndSourceMap.should.not.be.called;
         });
 
-        it('should handle old-style useSourceMap second parameter (true)', function() {
+        it('should handle old-style useSourceMap second parameter (true)', function () {
             var file = new File('1.js', true);
 
             file.render();
@@ -314,34 +315,34 @@ describe('File', function () {
             return utils.joinContentAndSourceMap.should.be.called;
         });
 
-        it('should use inline comments by default', function() {
-            var file = new File('1.js', {sourceMap: true});
+        it('should use inline comments by default', function () {
+            var file = new File('1.js', { sourceMap: true });
 
             file.render();
 
             utils.joinContentAndSourceMap.should.be.calledWithMatch(
                 sinon.match.string,
                 sinon.match.instanceOf(SourceMapGenerator),
-                {comment: 'inline'}
+                { comment: 'inline' }
             );
         });
 
-        it('should handle comment option', function() {
-            var file = new File('1.js', {sourceMap: true, comment: 'block'});
+        it('should handle comment option', function () {
+            var file = new File('1.js', { sourceMap: true, comment: 'block' });
 
             file.render();
 
             utils.joinContentAndSourceMap.should.be.calledWithMatch(
                 sinon.match.string,
                 sinon.match.instanceOf(SourceMapGenerator),
-                {comment: 'block'}
+                { comment: 'block' }
             );
         });
     });
 
     describe('chaining', function () {
         beforeEach(function () {
-            file = new File('1.js', {sourceMap: true});
+            file = new File('1.js', { sourceMap: true });
         });
 
         it('should support chaining', function () {
@@ -357,13 +358,13 @@ describe('File', function () {
     });
 });
 
-///
 function toReadableString(sourceMap) {
     var consumer = sourceMap instanceof SourceMapConsumer
-        ? sourceMap
-        : new SourceMapConsumer(sourceMap);
-    var pieces = [];
-    consumer.eachMapping(function(mapping) {
+            ? sourceMap
+            : new SourceMapConsumer(sourceMap),
+        pieces = [];
+
+    consumer.eachMapping(function (mapping) {
         pieces.push(format('%s, %s -> %s, %s  %s',
             mapping.generatedLine,
             mapping.generatedColumn,
