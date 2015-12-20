@@ -25,9 +25,8 @@
     "sinon-chai": "2.8.0"
   },
   "scripts": {
-    "test": "npm run-script jshint && npm run-script check-style && npm run-script unit",
-    "jshint": "jshint .",
-    "unit": "mocha test",
-    "check-style": "jscs -c jscs.js lib"
+    "test": "npm run lint && npm run unit",
+    "lint": "jshint . && jscs -c jscs.js lib",
+    "unit": "mocha test"
   }
 }
