@@ -338,6 +338,23 @@ describe('File', function () {
             );
         });
     });
+
+    describe('chaining', function () {
+        beforeEach(function () {
+            file = new File('1.js', {sourceMap: true});
+        });
+
+        it('should support chaining', function () {
+            file
+                .writeFileContent('2.js', 'line 1')
+                .writeLine('line 2')
+                .writeContent('line 3')
+                .write('line 4\n')
+                .writeFileFragment('2.js', 'line 5', 5, 0);
+
+            file.getContent().should.equal('line 1\nline 2\nline 3\nline 4\nline 5');
+        });
+    });
 });
 
 ///
