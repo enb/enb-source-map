@@ -201,6 +201,15 @@ describe('File', function () {
                     pos.source.should.equal('/other/path/source.js');
                 });
 
+                it('should handle sourceRoot option', function () {
+                    var file = new File('1.js', { sourceMap: true, sourceRoot: 'http://example.com/app/js/' });
+
+                    file.writeFileContent('../other/path/source.js', 'line');
+
+                    var pos = getOriginalSourceMapPosition({ line: 1, column: 0 }, file.getSourceMap());
+                    pos.source.should.equal('http://example.com/app/other/path/source.js');
+                });
+
                 it('should correctly handle column numbers', function () {
                     var css = [
                             '.button',
