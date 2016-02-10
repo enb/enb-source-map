@@ -145,6 +145,23 @@ describe('File', function () {
                     ].join('\n')
                 );
             });
+
+            describe('previous map support', function () {
+                it('should support previoud map', function () {
+                    var mapObj = {
+                            version:  3,
+                            sources:  ['2.js'],
+                            names:    [],
+                            mappings: ''
+                        },
+                        map = JSON.stringify(mapObj),
+                        b64 = new Buffer(map).toString('base64');
+
+                    file.writeFileFragment('2.js', 'line 1\nline 2', 1, 0, {
+                        prevMap: b64
+                    });
+                });
+            });
         });
 
         describe('writeFileContent()', function () {
