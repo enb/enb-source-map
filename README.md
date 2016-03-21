@@ -1,8 +1,8 @@
 enb-source-map
 ==============
 
-[![NPM version](https://img.shields.io/npm/v/enb-source-map.svg?style=flat)](https://www.npmjs.org/package/enb-source-map) [![Build Status](https://img.shields.io/travis/enb-make/enb-source-map/master.svg?style=flat&label=tests)](https://travis-ci.org/enb-make/enb-source-map)
-[![Dependency Status](https://img.shields.io/david/enb-make/enb-source-map.svg?style=flat)](https://david-dm.org/enb-make/enb-source-map)
+[![NPM version](https://img.shields.io/npm/v/enb-source-map.svg?style=flat)](https://www.npmjs.org/package/enb-source-map) [![Build Status](https://img.shields.io/travis/enb/enb-source-map/master.svg?style=flat&label=tests)](https://travis-ci.org/enb/enb-source-map)
+[![Dependency Status](https://img.shields.io/david/enb/enb-source-map.svg?style=flat)](https://david-dm.org/enb/enb-source-map)
 
 Помошник для работы с картами кода.
 

@@ -3,14 +3,14 @@
   "version": "1.9.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/enb-make/enb-source-map.git"
+    "url": "git://github.com/enb/enb-source-map.git"
   },
   "author": "Marat Dulin",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/enb-make/enb-source-map/issues"
+    "url": "https://github.com/enb/enb-source-map/issues"
   },
-  "homepage": "https://github.com/enb-make/enb-source-map",
+  "homepage": "https://github.com/enb/enb-source-map",
   "dependencies": {
     "atob": "2.0.0",
     "btoa": "1.1.2",

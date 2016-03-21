@@ -73,6 +73,6 @@ new File('path/to/file', { sourceMap: true, comment: 'block' });
 * В модуль `utils` добавлен метод `joinContentAndSourceMap`.
 * Исправлены незначительные ошибки.
 
-[#13]: https://github.com/enb-make/enb-source-map/pull/13
-[#7]: https://github.com/enb-make/enb-source-map/pull/7
-[#6]: https://github.com/enb-make/enb-source-map/pull/6
+[#13]: https://github.com/enb/enb-source-map/pull/13
+[#7]: https://github.com/enb/enb-source-map/pull/7
+[#6]: https://github.com/enb/enb-source-map/pull/6
