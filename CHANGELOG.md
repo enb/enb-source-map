@@ -1,6 +1,22 @@
 История изменений
 =================
 
+1.10.0
+------
+
+### File
+
+* Добавлена опция `sourceRoot` (@tadatuta [#15]).
+* Ускорен метод `write` (@AndrewUldin [#17]).
+
+[#15]: https://github.com/enb/enb-source-map/pull/15/
+[#17]: https://github.com/enb/enb-source-map/pull/17/
+
+### Зависимости
+
+* Модуль `atob@2.0.0` обновлен до версии `2.0.3`.
+* Модуль `source-map@0.5.3` обновлен до версии `0.5.6`.
+
 1.9.0
 -----
 
