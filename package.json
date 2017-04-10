@@ -12,9 +12,9 @@
   },
   "homepage": "https://github.com/enb/enb-source-map",
   "dependencies": {
-    "atob": "2.0.0",
+    "atob": "2.0.3",
     "btoa": "1.1.2",
-    "source-map": "0.5.3"
+    "source-map": "0.5.6"
   },
   "devDependencies": {
     "chai": "3.4.1",
