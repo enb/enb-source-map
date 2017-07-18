@@ -1,6 +1,14 @@
 История изменений
 =================
 
+1.11.0
+------
+
+### File
+
+* Добавлен метод `writeFileFromPrevMap`. https://github.com/enb/enb-source-map/pull/18
+
+
 1.10.0
 ------
 
