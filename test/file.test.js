@@ -349,6 +349,31 @@ describe('File', function () {
         });
     });
 
+    describe('previous source maps', function () {
+        it('should support previous source maps', function () {
+            file = new File('all.templates.js', { sourceMap: true });
+
+            file.writeFileContent('one.js', 'function one() {}');
+            file.writeFileContent('two.js', 'function two() {}');
+
+            var code = file.render(),
+                prevMap = file.getSourceMap();
+
+            prevMap.file = 'all.bundle.js';
+
+            file = new File('all.bundle.js', { sourceMap: {
+                from: 'all.bundle.js',
+                prev: prevMap
+            } });
+
+            file.writeFileContent('all.templates.js', code);
+
+            var resultSourceMap = file.getSourceMap();
+            resultSourceMap.mappings.should.equal('AAAA;ACAA');
+            resultSourceMap.sources.toString().should.equal('one.js,two.js');
+        });
+    });
+
     describe('chaining', function () {
         beforeEach(function () {
             file = new File('1.js', { sourceMap: true });
