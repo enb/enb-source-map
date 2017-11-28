@@ -1,6 +1,17 @@
 История изменений
 =================
 
+1.12.0
+------
+
+### File
+
+* Добавлена поддержка предыдущих карт кода, на основе которых далее можно будет строить последующие сборки с картами кода.
+
+Commits:
+* [[`6701abda3b`](https://github.com/enb/enb-source-map/commit/6701abda3b)] - **File**: support previuos source maps (Fix for https://github.com/enb/enb-bemxjst/issues/283) (miripiruni)
+
+
 1.11.0
 ------
 
