@@ -12,7 +12,8 @@ enb-source-map
 ```js
 var fs = require('fs'),
     File = require('enb-source-map/lib/file'),
-    file = new File('output.js', { sourceMap: true });
+    file = new File('output.js', { sourceMap: { from: 'bundle.js', prev: { /*
+    source map object */ } });
 
 file
     .write('line')
@@ -21,7 +22,7 @@ file
     .writeFileFragment('input-2.js', fs.readFileSync('input-2.js', 'utf-8').split('\n').pop(), 1, 0)
     .writeLine('line 2');
 
-file.getContent();   
+file.getContent();
 // line-1
 // input-1-contents
 // input-2-fragment
