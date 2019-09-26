@@ -12,8 +12,8 @@
   },
   "homepage": "https://github.com/enb/enb-source-map",
   "dependencies": {
-    "atob": "2.0.3",
-    "btoa": "1.1.2",
+    "atob": "2.1.2",
+    "btoa": "1.2.1",
     "source-map": "0.5.6"
   },
   "devDependencies": {
