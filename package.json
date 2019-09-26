@@ -1,6 +1,6 @@
 {
   "name": "enb-source-map",
-  "version": "1.12.0",
+  "version": "1.12.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/enb/enb-source-map.git"
